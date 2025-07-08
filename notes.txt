@@ -1,0 +1,7 @@
+migrations 
+why?? make changes to db without losing data , 
+
+// 
+alembic init <foldername>
+alembic revision --autogenerate -m "message"
+alembic upgrade/downgrade head
