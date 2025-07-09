@@ -14,3 +14,8 @@ class Settings(BaseSettings):
 
 
 Config = Settings()
+
+# Add this for debugging
+print("--- SETTINGS LOADED ---")
+print(f"Database URL: {Config.DATABASE_URL}")
+print("-----------------------")

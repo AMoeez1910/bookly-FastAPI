@@ -23,6 +23,14 @@ class UserCreate(BaseModel):
     last_name: str
 
 
+class UserLogin(BaseModel):
+    email: str
+    password: str = Field(min_length=6, max_length=128)
+
+    class Config:
+        from_attributes = True  # Enable ORM mode for compatibility with SQLModel
+
+
 class UserUpdate(BaseModel):
     username: str | None = None
     email: str | None = None
@@ -31,4 +39,4 @@ class UserUpdate(BaseModel):
     is_verified: bool | None = None
 
     class Config:
-        orm_mode = True  # Enable ORM mode for compatibility with SQLModel
+        from_attributes = True  # Enable ORM mode for compatibility with SQLModel

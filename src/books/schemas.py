@@ -1,11 +1,10 @@
-import uuid
 from datetime import datetime
 
 from pydantic import BaseModel
 
 
 class Book(BaseModel):
-    uid: uuid.UUID
+    uid: str
     title: str
     author: str
     published_year: int
