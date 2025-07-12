@@ -4,9 +4,8 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from sqlmodel import select
 
-from src.db import SessionDep
+from src.db import SessionDep, User
 
-from .models import User
 from .schemas import UserCreate, UserLogin, UserUpdate
 from .utils import create_access_token, generate_password_hash, verify_password
 
@@ -34,6 +33,7 @@ class AuthService:
         hash_password = generate_password_hash(user_data.password)
         user = User(**user_data.model_dump())
         user.password_hash = hash_password
+        user.role = "user"
         session.add(user)
         session.commit()
         session.refresh(user)
@@ -66,21 +66,15 @@ class AuthService:
                 access_token = create_access_token(
                     user_data={
                         "uid": str(user.uid),
-                        "username": user.username,
                         "email": user.email,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "is_verified": user.is_verified,
+                        "role": user.role,
                     }
                 )
                 refresh_token = create_access_token(
                     user_data={
                         "uid": str(user.uid),
-                        "username": user.username,
                         "email": user.email,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "is_verified": user.is_verified,
+                        "role": user.role,
                     },
                     expiry=timedelta(days=30),
                     refresh=True,

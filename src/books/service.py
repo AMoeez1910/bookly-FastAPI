@@ -1,9 +1,10 @@
+import uuid
+
 from fastapi import HTTPException
 from sqlmodel import select
 
-from src.db import SessionDep
+from src.db import Book, SessionDep
 
-from .models import Book
 from .schemas import BookCreate
 
 
@@ -20,8 +21,14 @@ class BookService:
             )
         return book
 
-    async def create_book(self, book_data: BookCreate, session: SessionDep):
+    async def create_book(
+        self,
+        book_data: BookCreate,
+        session: SessionDep,
+        user_uid: str,
+    ):
         book = Book(**book_data.model_dump())
+        book.user_uid = uuid.UUID(user_uid)
         session.add(book)
         session.commit()
         session.refresh(book)

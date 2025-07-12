@@ -5,3 +5,7 @@ why?? make changes to db without losing data ,
 alembic init <foldername>
 alembic revision --autogenerate -m "message"
 alembic upgrade/downgrade head
+
+///
+    python -m venv <environment_name>
+    <environment_name>\Scripts\activate.bat

@@ -1,15 +1,20 @@
 import logging
+from typing import List
 
-from fastapi import Request
+from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPBearer
 from fastapi.security.http import HTTPAuthorizationCredentials
+from sqlmodel import select
 
+from src.db import SessionDep, User
+
+from ..db import is_jti_blocked
 from .utils import decode_access_token
 
 
 class TokenBearer(HTTPBearer):
-    def _init(self, auto_error=True):
+    def __init__(self, auto_error=True):
         super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
@@ -22,16 +27,19 @@ class TokenBearer(HTTPBearer):
                 detail="Invalid or expired access token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-
+        if await is_jti_blocked(token_data["jti"]):
+            raise HTTPException(
+                status_code=403,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         self.verify_token_data(token_data)
         return token_data
 
     def token_valid(self, token: str) -> bool:
         try:
             payload = decode_access_token(token)
-            if payload is None:
-                return False
-            return True
+            return payload is not None
         except ValueError as e:
             logging.error(f"Token validation error: {str(e)}")
             return False
@@ -60,3 +68,26 @@ class RefreshTokenBearer(TokenBearer):
                 detail="Access token is not a refresh token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+
+
+def get_current_logged_in_user(
+    session: SessionDep, token_details: dict = Depends(AccessTokenBearer())
+):
+    user_email = token_details["user"]["email"]
+    user = session.exec(select(User).where(User.email == user_email)).first()
+
+    return user
+
+
+class RoleChecker:
+    def __init__(self, allowed_roles: List[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: User = Depends(get_current_logged_in_user)):
+        if user.role not in self.allowed_roles:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to perform this action",
+            )
+
+        return True

@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from src.config import Config
 
 passwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-ACCESS_TOKEN_EXPIRY = 20
+ACCESS_TOKEN_EXPIRY = 600
 
 
 def generate_password_hash(password: str) -> str:
