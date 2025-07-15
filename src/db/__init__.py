@@ -1,7 +1,7 @@
 """Database module exports."""
 
 from .main import SessionDep, engine, get_session, init_db
-from .models import Book, User
+from .models import Book, User,Reviews
 from .redis import add_jti_to_blocklist, is_jti_blocked
 
 __all__ = [
@@ -13,4 +13,5 @@ __all__ = [
     "add_jti_to_blocklist",
     "User",
     "Book",
+    "Reviews",
 ]

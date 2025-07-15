@@ -7,7 +7,7 @@ from src.db import SessionDep
 
 from ..auth import AccessTokenBearer
 from .schemas import Book as BookSchema
-from .schemas import BookCreate
+from .schemas import BookCreate, BookUpdate
 from .service import BookService
 
 book_router = APIRouter()
@@ -60,7 +60,7 @@ async def create_book(
 )
 async def update_book_partial(
     book_id: str,
-    book: BookCreate,
+    book: BookUpdate,
     session: SessionDep,
 ):
     """

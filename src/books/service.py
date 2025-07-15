@@ -5,7 +5,7 @@ from sqlmodel import select
 
 from src.db import Book, SessionDep
 
-from .schemas import BookCreate
+from .schemas import BookCreate, BookUpdate
 
 
 class BookService:
@@ -14,7 +14,7 @@ class BookService:
         return books
 
     async def get_book_by_id(self, book_id: str, session: SessionDep):
-        book = session.exec(select(Book).where(Book.uid == book_id)).first()
+        book = session.exec(select(Book).where(Book.uid == uuid.UUID(book_id))).first()
         if not book:
             raise HTTPException(
                 status_code=404, detail=f"Book with id {book_id} not found"
@@ -35,10 +35,10 @@ class BookService:
         return book
 
     async def update_book(
-        self, book_id: str, book_data: BookCreate, session: SessionDep
+        self, book_id: str, book_data: BookUpdate, session: SessionDep
     ):
-        book = session.get(Book, book_id)
-
+        book = session.get(Book, uuid.UUID(book_id))
+        print("Book", book)
         if not book:
             raise HTTPException(status_code=404, detail="Hero not found")
         hero_data = book_data.model_dump(exclude_unset=True)

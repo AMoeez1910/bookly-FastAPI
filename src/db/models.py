@@ -19,6 +19,7 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     books: List["Book"] = Relationship(back_populates="user")
+    reviews: List["Reviews"] = Relationship(back_populates="user")
 
     def __repr__(self):
         return f"User(uid={self.uid}, username={self.username}, email={self.email})"
@@ -40,6 +41,20 @@ class Book(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     user: Optional["User"] = Relationship(back_populates="books")
+    reviews: List["Reviews"] = Relationship(back_populates="book")
 
     def __repr__(self):
         return f"Book(uid={self.uid}, title={self.title}, author={self.author})"
+
+
+class Reviews(SQLModel, table=True):
+    __tablename__ = "reviews"
+    uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    book_uid: uuid.UUID = Field(foreign_key="books.uid", nullable=False)
+    user_uid: uuid.UUID = Field(foreign_key="users.uid", nullable=False)
+    rating: int = Field(ge=1, le=5)  # Rating between 1 and 5
+    comment: Optional[str] = Field(default=None, nullable=True)
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+    book: Optional[Book] = Relationship(back_populates="reviews")
+    user: Optional[User] = Relationship(back_populates="reviews")

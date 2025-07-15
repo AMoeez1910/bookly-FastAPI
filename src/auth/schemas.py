@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, Field
-from typing import List
+
 from src.schemas import BookAttributes
 
 
@@ -16,7 +17,6 @@ class User(BaseModel):
     is_verified: bool
     created_at: datetime
     updated_at: datetime
-    books: List[BookAttributes]
 
 
 class UserCreate(BaseModel):
@@ -41,6 +41,13 @@ class UserAttributes(BaseModel):
     email: str
     first_name: str
     last_name: str
+
+
+class UserBookModel(User):
+    books: List[BookAttributes]
+
+    class Config:
+        from_attributes = True  # Enable ORM mode for compatibility with SQLModel
 
 
 class UserUpdate(BaseModel):

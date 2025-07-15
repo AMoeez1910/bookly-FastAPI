@@ -11,7 +11,7 @@ from .dependencies import (
     RefreshTokenBearer,
     get_current_logged_in_user,
 )
-from .schemas import User, UserCreate, UserLogin
+from .schemas import User, UserBookModel, UserCreate, UserLogin
 from .service import AuthService
 from .utils import create_access_token
 
@@ -50,6 +50,6 @@ async def logout_user(token_details: dict = Depends(AccessTokenBearer())):
     return JSONResponse(status_code=204, content={"message": "Successfully logged out"})
 
 
-@auth_router.get("/user", response_model=User)
+@auth_router.get("/user", response_model=UserBookModel)
 async def get_current_user(user_details=Depends(get_current_logged_in_user)):
     return user_details
